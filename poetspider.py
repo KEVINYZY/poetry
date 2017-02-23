@@ -38,7 +38,9 @@ def view_poet(url):
     poemsoup = BeautifulSoup(html, 'html.parser')
     return poemsoup
 
-fh = open('poems.txt','a')
+fh = open('poems.txt','w')
+fh.write('')
+fh = open('poems.txt','w')
 
 #poemlists = ['/PoemIndex.aspx?dynasty=Tang&author=李白']
 #本句测试用
@@ -53,10 +55,11 @@ for poemlist in poemlists:
     page = 0
     
     while 1 :
-        html = view_poet(poemlist+'&type=All&page='+str(page))
-        #print page
-        
         try:
+            html = view_poet(poemlist+'&type=All&page='+str(page))
+            #print page
+        
+        
             if '下一页' in str(html):
                 page = page + 1
                 #print html
@@ -74,7 +77,7 @@ for poemlist in poemlists:
                         
                         for sentence in final:
                             #print type(sentence)
-                            fh.write(sentence.encode('utf-8')+'\n\n')
+                            fh.write(sentence.encode('utf-8')+'\n')
                             n = n + 1    
                         continue                    
                         '''

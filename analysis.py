@@ -1,5 +1,22 @@
 #coding=utf-8
 #import poetspider
+from collections import defaultdict
+
+import sqlite3
+
+database = sqlite3.connect("poems.db")
+try:
+    database.execute('''CREATE TABLE POEMS(  id INT    PRIMARY KEY   NOT NULL,poems   TEXT NOT NULL);''')
+except:
+    print 'table "POEMS" is already exist'
+
+try:
+    database.execute('''CREATE TABLE CHARS(  id INT    PRIMARY KEY   NOT NULL,poems   TEXT NOT NULL);''')
+except:
+    print 'table "CHARS" is already exist'
+
+countingresult = defaultdict(list)
+countingdict = {}
 
 fh = open('poems.txt','r')
 
@@ -8,12 +25,10 @@ fh2.write('')
 fh2.close()
 fh2 = open('poems2.txt','a')
 
-
 fh3 = open('counting.txt','w')
 fh3.write('')
 fh3.close()
 fh3 = open('counting.txt','a')
-
 
 chars = fh.read()
 
@@ -40,22 +55,63 @@ for i in chars:
 
 #print result
 
+n=0
 for i in result:
     poem = i.encode('utf-8')
-    fh2.write(poem)          
+    n=n+1
+    fh2.write(poem)
+#print n
+
+
+fh2=open('poems2.txt','r')
+
+n = 0
+while True:
+    poems = fh2.readline()
+    if not poems:
+        break
+    else:
+        if poems == '\n':
+            continue
+        else:
+            n = n+1
+            values = (n,unicode(poems,'utf-8'))
+            database.execute("insert into POEMS values(?,?)",values)
+        
+database.commit()
+print n
+
+fh2=open('poems2.txt','r')
+
+allpoems = fh2.read()
+allpoems = allpoems.replace('\n','')
+allpoems = unicode(allpoems,'utf-8')
+n = 0
+
+for i in allpoems:
+    #print i
+    if i is '\n':
+        continue
+    n = n+1
+    values = (n,i)
+    database.execute("insert into CHARS values(?,?)",values)
+    
+
+database.commit()
+
+print n
 
 poems=[]
 for i in result:
     poem = i.encode('utf-8')
     poems.append(poem)
 
-
-countingdict={}
-print 'finishanalysis'
+#countingdict={}
+#print 'finishanalysis'
 
 for i in poems:
     if i in countingdict:
-        countingdict[i]= countingdict[i]+1
+        countingdict[i] = countingdict[i]+1
     else:
         countingdict[i] = 1
 
@@ -63,19 +119,18 @@ summary = 0
 for i in countingdict:
     summary = countingdict[i]+summary
 
-
-
 for i in countingdict:
-    fh3.write(i+':'+str(countingdict[i])+str(countingdict[i]/summary)+'\n')
+    #countingdict[i].append(countingdict[i]/summary)
+    share = float(countingdict[i])/float(summary)
+    countingresult[i].append([share])
+    fh3.write(i+':'+str(countingdict[i])+str(share)+'\n')
 
-print summary
+#print countingresult
+#print summary
+print 'finishanalysis'
 
 fh.close()
 fh2.close()
 fh3.close()
-
-
-
-
-
+database.close()
 
