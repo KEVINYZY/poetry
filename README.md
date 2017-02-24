@@ -12,4 +12,4 @@ pypinyin(sudo pip install pypinyin)
 
 beautifulsoup
 
-储存才用sqlite数据库
+储存采用sqlite数据库
